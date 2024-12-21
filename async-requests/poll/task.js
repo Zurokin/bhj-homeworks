@@ -35,10 +35,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
       button.addEventListener("click", () => {
         alert("Спасибо, ваш голос засчитан!");
-        sendVote(data.id, index); // Отправляем голос
+        sendVote(data.id, index);
       });
 
       pollAnswers.appendChild(button);
+    });
+  }
+
+  function renderResults(stats) {
+    const pollAnswers = document.getElementById("poll__answers");
+    pollAnswers.innerHTML = "";
+
+    const totalVotes = stats.reduce((sum, item) => sum + item.votes, 0);
+    stats.forEach((stat) => {
+      const percentage = ((stat.votes / totalVotes) * 100).toFixed(2);
+      const resultDiv = document.createElement("div");
+      resultDiv.className = "poll__result";
+      resultDiv.textContent = `${stat.answer}: ${percentage}% (${stat.votes} голосов)`;
+      pollAnswers.appendChild(resultDiv);
     });
   }
 
@@ -50,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log(`Отправляю голос: vote=${voteId}&answer=${answerIndex}`);
 
     xhr.onload = () => {
-      if (xhr.status === 200) {
+      if (xhr.status === 201) {
         console.log("Результаты голосования:", xhr.response);
         const results = JSON.parse(xhr.response);
         renderResults(results.stat);
